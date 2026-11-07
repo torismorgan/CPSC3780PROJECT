@@ -1,0 +1,19 @@
+FieldDrop packet examples for the three-byte file ABC.
+Session ID: 0x01020304. Spaces separate bytes.
+
+HELLO (total size 3, sequence 0):
+46 44 01 01 01 02 03 04 00 00 00 00 00 04 00 00 a5 ea 20 c2 00 00 00 03
+
+DATA (sequence 1, payload ABC):
+46 44 01 02 01 02 03 04 00 00 00 01 00 03 00 00 4b 5a 87 8c 41 42 43
+
+ACK (sequence 1):
+46 44 01 03 01 02 03 04 00 00 00 01 00 00 00 00 b9 64 71 fc
+
+FIN (sequence 2):
+46 44 01 04 01 02 03 04 00 00 00 02 00 00 00 00 83 b7 0d 74
+
+FIN_ACK (sequence 2):
+46 44 01 05 01 02 03 04 00 00 00 02 00 00 00 00 5e 21 d4 f1
+
+These are wire-format examples, not a replacement for full protocol tests.
