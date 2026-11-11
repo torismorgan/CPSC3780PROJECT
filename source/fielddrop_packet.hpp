@@ -3,6 +3,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
+#include <vector>
 
 // Wire-format constants from the assignment. Multibyte values on the wire
 // use network byte order. Implement encoding and validation in your own files.
@@ -26,12 +28,31 @@ enum class PacketType : std::uint8_t {
     FinAck = 5,
 };
 
-// TODO: Define a host-order packet representation and functions to:
-//  - serialize a packet to bytes;
-//  - parse a complete UDP datagram;
-//  - validate type-specific fields, size, session ID, and CRC-32.
-// Do not send a C++ struct directly: padding and host byte order are not
-// the specified wire format.
+
+// Host-order representation of a FieldDrop packet.
+// Payload contains only the packet's data bytes.
+struct Packet {
+    PacketType type{};
+    std::uint32_t sessionId = 0;
+    std::uint32_t sequence = 0;
+    std::vector<std::uint8_t> payload;
+};
+
+// Convert a packet into its wire-format representation.
+bool serializePacket(
+    const Packet& packet,
+    std::vector<std::uint8_t>& output,
+    std::string* error = nullptr
+);
+
+// Parse and validate a complete UDP datagram. Checks the header, packet rules, length, and CRC-32.
+bool parsePacket(
+    const std::uint8_t* data,
+    std::size_t size,
+    Packet& packet,
+    std::string* error = nullptr
+);
+
 
 } // namespace fielddrop
 
