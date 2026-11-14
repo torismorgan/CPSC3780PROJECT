@@ -1,41 +1,79 @@
-# FieldDrop student starter
+# FieldDrop (CPSC 3780, Fall 2026)
 
-This folder is a starting point for the CPSC 3780 FieldDrop project. Read `ASSIGNMENT.md` before writing code. The sender and receiver currently display usage information and otherwise exit with a `not implemented` message; a successful build is **not** a working transfer.
+Stop-and-wait file transfer over IPv4 UDP. `fielddrop-send` sends one file to
+`fielddrop-recv`, which writes it to a new output file.
 
-## Build
+## Build (course Linux PC)
 
-On the course Linux environment:
+Requires `g++`, `make` and the zlib development files (all on the course image).
 
 ```sh
-make
-./fielddrop-send --help
-./fielddrop-recv --help
-make clean
+make clean && make
 ```
 
-The Makefile uses C++17 and links zlib. Add your own `.cpp` files to the Makefile as needed.
+This produces `./fielddrop-send` and `./fielddrop-recv`. `make clean` removes
+them (and the packet-vector checker).
 
-## Suggested implementation order
+## Normal transfer
 
-1. Implement packet serialization, parsing, and CRC-32. Compare output with `tests/packet-vectors.txt`.
-2. Implement a basic localhost transfer for empty, small, and multipacket files.
-3. Add retransmission, duplicate handling, validation, and temporary-file completion.
-4. Test each executable against the course reference peer and fault relay.
-5. Run the supplied Kathará practice lab, then prepare the final ZIP. Keep an identical copy of that submitted ZIP for your workstation demonstration.
+Terminal 1 (receiver; the output file must not already exist):
 
-`source/fielddrop_packet.hpp` defines only constants and wire-format names. It does not provide a packet encoder, parser, or reliability implementation. Keep the protocol in the assignment authoritative if starter comments and the assignment ever differ.
+```sh
+./fielddrop-recv received.bin 43000
+```
 
-## Starter contents
+Terminal 2 (sender):
 
-- `source/`: C++ scaffolding; implement the sender, receiver, and packet operations here.
-- `tests/`: published packet examples and deterministic fixtures.
-- `kathara/`: a basic two-device topology and `prepare_shared.sh` helper. Course staff should test it on the class Kathará image before distribution.
-- `kathara/stage_submission.sh`: stages the exact submitted Makefile and source in a clean lab for the assessed workstation visit.
-- `field-trial/`, `evidence/`: places for your own results.
-- `ACKNOWLEDGMENTS.md`, `CONTRIBUTIONS.md`, `report-outline.md`: submission writing aids.
+```sh
+./fielddrop-send tests/abc.txt 127.0.0.1 43000
+```
 
-The instructor reference peers, fault relay, and packet injector are separate course tools and are not included in this starter.
+Both programs exit 0 on success. The receiver stays up for about six seconds
+after FIN to answer a repeated FIN; that wait is expected. Check the result:
 
-## Live workstation readiness
+```sh
+sha256sum tests/abc.txt received.bin
+```
 
-After submission, extract the same ZIP you submitted on a university Linux lab PC. Use a clean copy of this starter lab and run `sh kathara/stage_submission.sh PATH_TO_EXTRACTED_GROUP_FOLDER` from its root. Start `pc1` and `pc2` with `kathara lstart --shared` from `kathara/`, build the staged code, and verify their addresses and ping. Leave the assessed sender and receiver stopped until the marker arrives. The marker will create fresh input only in `pc1`'s local `/tmp` and choose a new output path in `pc2`'s local `/tmp`. Each member should be ready to explain their work and a submitted fault trace. See `kathara/README.md` and the assignment's demonstration section.
+The sender prints a timestamped log of every packet sent, received, ignored or
+timed out on stderr.
+
+Exit statuses (sender): `0` success, `2` wrong argument count or invalid port,
+`1` any other failure (unreadable or oversized input, unresolvable host, no
+reply after 10 transmissions).
+
+## Packet-vector check
+
+```sh
+make check-vectors
+```
+
+Encodes the published ABC packets and compares them with
+`tests/packet-vectors.txt`. See `tests/PACKET_VECTORS.md`.
+
+## Course tests
+
+Course tools location: extract the course-tool ZIP matching `uname -m`
+(`FieldDrop_Course_Tools/`) **next to** the unmodified
+`FieldDrop_Student_Starter/` folder; the course script reads fixtures from the
+starter folder. Then, from this project folder:
+
+```sh
+sh tests/run_cp1.sh PATH_TO/FieldDrop_Course_Tools
+```
+
+This builds the project, runs Checkpoint 1 cases 1, 2, 3, 4, 15, 16 with our
+sender and receiver, plus case 2 in both reference-peer combinations, and saves
+logs, hashes and PASS/FAIL lines in `evidence/cp1/`. A single case can also be
+run directly:
+
+```sh
+PATH_TO/FieldDrop_Course_Tools/scripts/run_case.sh 2 "$PWD/fielddrop-send" "$PWD/fielddrop-recv"
+```
+
+## Layout
+
+- `source/` – C++ sources: `fielddrop_packet.*` (encode/parse/CRC-32),
+  `sender.cpp`, `receiver.cpp`.
+- `tests/` – fixtures, packet-vector checker, test procedures and summaries.
+- `evidence/` – logs, hashes and course-script output.

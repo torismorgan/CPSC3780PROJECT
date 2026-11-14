@@ -1,0 +1,9 @@
+.DS_Store
+fielddrop-send
+fielddrop-recv
+packet-vector-check
+# Course tools and zips must not be submitted
+FieldDrop_Course_Tools/
+FieldDrop_Course_Tools_*.zip
+FieldDrop_Student_Starter.zip
+checkpoint 3780/

@@ -1,0 +1,42 @@
+./packet-vector-check
+HELLO (size 3, seq 0)
+  produced:  46 44 01 01 01 02 03 04 00 00 00 00 00 04 00 00 a5 ea 20 c2 00 00 00 03
+  published: 46 44 01 01 01 02 03 04 00 00 00 00 00 04 00 00 a5 ea 20 c2 00 00 00 03
+  CRC-32 (bytes 16-19): match
+  all bytes: MATCH
+  parse published bytes: accepted, fields match
+  parse with last byte flipped: rejected (CRC-32 verification failed)
+
+DATA (seq 1, ABC)
+  produced:  46 44 01 02 01 02 03 04 00 00 00 01 00 03 00 00 4b 5a 87 8c 41 42 43
+  published: 46 44 01 02 01 02 03 04 00 00 00 01 00 03 00 00 4b 5a 87 8c 41 42 43
+  CRC-32 (bytes 16-19): match
+  all bytes: MATCH
+  parse published bytes: accepted, fields match
+  parse with last byte flipped: rejected (CRC-32 verification failed)
+
+ACK (seq 1)
+  produced:  46 44 01 03 01 02 03 04 00 00 00 01 00 00 00 00 b9 64 71 fc
+  published: 46 44 01 03 01 02 03 04 00 00 00 01 00 00 00 00 b9 64 71 fc
+  CRC-32 (bytes 16-19): match
+  all bytes: MATCH
+  parse published bytes: accepted, fields match
+  parse with last byte flipped: rejected (CRC-32 verification failed)
+
+FIN (seq 2)
+  produced:  46 44 01 04 01 02 03 04 00 00 00 02 00 00 00 00 83 b7 0d 74
+  published: 46 44 01 04 01 02 03 04 00 00 00 02 00 00 00 00 83 b7 0d 74
+  CRC-32 (bytes 16-19): match
+  all bytes: MATCH
+  parse published bytes: accepted, fields match
+  parse with last byte flipped: rejected (CRC-32 verification failed)
+
+FIN_ACK (seq 2)
+  produced:  46 44 01 05 01 02 03 04 00 00 00 02 00 00 00 00 5e 21 d4 f1
+  published: 46 44 01 05 01 02 03 04 00 00 00 02 00 00 00 00 5e 21 d4 f1
+  CRC-32 (bytes 16-19): match
+  all bytes: MATCH
+  parse published bytes: accepted, fields match
+  parse with last byte flipped: rejected (CRC-32 verification failed)
+
+RESULT: all packet vectors match
